@@ -7,20 +7,23 @@ workflows:
         PACKAGE_NAME: "com.fou.gestionor"
 
     scripts:
-      - name: Installer les dépendances système requises par Kivy/Buildozer
+      - name: Installer les dépendances système (macOS)
         script: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev
-
+          # Sur macOS, on utilise brew à la place d'apt-get
+          brew update
+          brew install autoconf libtool pkg-config
+          
       - name: Installer Buildozer et Cython
         script: |
-          pip install buildozer cython
+          pip3 install --user buildozer cython
+          # S'assurer que le chemin des scripts de pip est accessible
+          echo 'export PATH="$HOME/Library/Python/3.9/bin:$PATH"' >> $RC_FILE
 
       - name: Accepter automatiquement les licences Android SDK
         script: |
           mkdir -p "$HOME/.android"
           touch "$HOME/.android/repositories.cfg"
-          # Cette ligne répond "oui" en boucle à toutes les licences de Google
+          # Accepter les licences Google à l'aide de l'outil de buildozer
           yes | buildozer android licenses
 
       - name: Compiler l'application en APK (Debug)
