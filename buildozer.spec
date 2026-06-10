@@ -2,7 +2,7 @@
 
 title = Gestion Or
 package.name = gestionor
-package.domain = com.fouad
+package.domain = com.fou
 
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,kv,atlas
