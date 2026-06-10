@@ -4,7 +4,7 @@ workflows:
 
     environment:
       vars:
-        PACKAGE_NAME: "com.fouad.gestionor"
+        PACKAGE_NAME: "com.fou.gestionor"
 
     scripts:
       - pip install buildozer
