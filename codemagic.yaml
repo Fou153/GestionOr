@@ -14,19 +14,22 @@ workflows:
           
       - name: Installer Buildozer et Cython
         script: |
-          # Installation globale pour éviter les problèmes de PATH
           pip3 install buildozer cython
 
       - name: Accepter automatiquement les licences Android SDK
         script: |
           mkdir -p "$HOME/.android"
           touch "$HOME/.android/repositories.cfg"
-          # Validation automatique des licences Google
-          yes | buildozer android licenses
+          
+          # Option 1 : Accepter via le sdkmanager natif de la machine Codemagic
+          if command -v sdkmanager &> /dev/null; then
+            yes | sdkmanager --licenses
+          fi
 
       - name: Compiler l'application en APK (Debug)
         script: |
-          buildozer android debug
+          # On passe l'argument automatique directement à Buildozer pendant le build
+          yes | buildozer android debug
 
     artifacts:
       - bin/*.apk
