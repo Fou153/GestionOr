@@ -10,11 +10,14 @@ workflows:
       - name: Installer les dépendances système (macOS)
         script: |
           brew update
-          brew install autoconf libtool pkg-config
+          # Ajout de paquets souvent requis pour la compilation croisée sous macOS
+          brew install autoconf libtool pkg-config gettext
+          brew link --force gettext
           
       - name: Installer Buildozer et Cython
         script: |
-          pip3 install buildozer cython
+          # On s'assure d'installer une version stable de Cython adaptée à Kivy 2.3.0
+          pip3 install buildozer "cython<3.0.0"
 
       - name: Accepter automatiquement les licences Android SDK
         script: |
@@ -26,13 +29,21 @@ workflows:
 
       - name: Compiler l'application en APK (Debug)
         script: |
-          # ÉTAPE CRUCIALE : On efface les variables de l'hôte qui perturbent Buildozer
+          # 1. Nettoyage des variables conflictuelles de Codemagic
           unset ANDROID_SDK_HOME
           unset ANDROID_NDK_HOME
           unset ANDROID_HOME
           
-          # On lance la compilation en forçant la réponse automatique "yes"
-          yes | buildozer android debug
+          # 2. Correctifs spécifiques pour la compilation de Python sur macOS
+          export PATH="/opt/homebrew/opt/gettext/bin:$PATH"
+          export LDFLAGS="-L/opt/homebrew/opt/gettext/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/gettext/include"
           
+          # 3. Forcer buildozer à nettoyer les caches de build précédents qui ont échoué
+          buildozer clean
+          
+          # 4. Lancement de la compilation
+          yes | buildozer android debug
+
     artifacts:
       - bin/*.apk
