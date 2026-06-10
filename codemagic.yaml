@@ -20,16 +20,19 @@ workflows:
         script: |
           mkdir -p "$HOME/.android"
           touch "$HOME/.android/repositories.cfg"
-          
-          # Option 1 : Accepter via le sdkmanager natif de la machine Codemagic
           if command -v sdkmanager &> /dev/null; then
             yes | sdkmanager --licenses
           fi
 
       - name: Compiler l'application en APK (Debug)
         script: |
-          # On passe l'argument automatique directement à Buildozer pendant le build
+          # ÉTAPE CRUCIALE : On efface les variables de l'hôte qui perturbent Buildozer
+          unset ANDROID_SDK_HOME
+          unset ANDROID_NDK_HOME
+          unset ANDROID_HOME
+          
+          # On lance la compilation en forçant la réponse automatique "yes"
           yes | buildozer android debug
-
+          
     artifacts:
       - bin/*.apk
